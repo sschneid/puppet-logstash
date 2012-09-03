@@ -1,9 +1,10 @@
 class logstash::package($logstash_version = '1.1.1',
 			$logstash_provider = 'http',
-			$logstash_home = '/usr/local/logstash' ) {
+			$logstash_home = '/usr/local/logstash',
+			$java_package = 'java-1.6.0-openjdk' ) {
 
 
-  $logstash_jar = "logstash-$logstash_version-monolithic.jar"
+  $logstash_jar = sprintf("%s-%s-%s", "logstash", $logstash_version, "monolithic.jar")
   $jar = "$logstash_home/$logstash_jar"
 
   # put the logstash jar somewhere
@@ -45,5 +46,6 @@ class logstash::package($logstash_version = '1.1.1',
   }
 
   # mundane required packages in the std repo
-  package { 'jdk-1.6.0_26-fcs': }
+  #package { 'jdk-1.6.0_26-fcs': }
+  package { "$java_package": }
 }
