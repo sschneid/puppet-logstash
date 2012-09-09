@@ -1,8 +1,43 @@
-class logstash::package($logstash_version = '1.1.1',
-			$logstash_provider = 'http',
-			$logstash_home = '/usr/local/logstash',
-			$java_package = 'java-1.6.0-openjdk' ) {
+# = Class: logstash::package
+#
+# Class to manage where we get the logstash jar from
+#
+# == Parameters:
+#
+# $logstash_version::   description of parameter. default value if any.
+# $logstash_provider::   description of parameter. default value if any.
+# $logstash_home::   description of parameter. default value if any.
+# $logstash_baseurl:: Where to curl the jar file from if http is used
+# defaults to http://semicomplete.com/files/logstash/
+# $java_package::   description of parameter. default value if any.
+#
+# == Actions:
+#
+# Makes sure that a logstash jar is available, via http, puppet or package
+#
+# == Requires:
+#
+# $logstash_provider='http' is the simplest and most tested method, 
+# it just curl's the file into place, so you need internet access,
+# unless you have mirror'd the file locally
+#
+# == Sample Usage:
+#
+# == Todo:
+#
+# * Add better support for other ways providing the jar file?
+#
+class logstash::package(
+  $logstash_home = '/opt/logstash',
+  $logstash_version = '1.1.1',
+  $logstash_provider = 'http',
+  $logstash_baseurl = 'http://semicomplete.com/files/logstash/',
+  $java_package = 'java-1.6.0-openjdk' )
+{
 
+  # naughtly, the logstash::config class creates the $logstash_home directory,
+  # make sure the directory exists!
+  Class['logstash::config'] -> Class['logstash::package']
 
   $logstash_jar = sprintf("%s-%s-%s", "logstash", $logstash_version, "monolithic.jar")
   $jar = "$logstash_home/$logstash_jar"
@@ -30,11 +65,11 @@ class logstash::package($logstash_version = '1.1.1',
   }
 
   if $logstash_provider == 'http' {
-    $logstash_baseurl = "http://semicomplete.com/files/logstash/"
     $logstash_url = "$logstash_baseurl/$logstash_jar"
 
     # pull in the logstash jar over http
     exec { "curl -o $logstash_home/$logstash_jar $logstash_url":
+      timeout => 0,
       cwd     => "/tmp",
       creates => "$logstash_home/$logstash_jar",
       path    => ["/usr/bin", "/usr/sbin"],
@@ -46,6 +81,5 @@ class logstash::package($logstash_version = '1.1.1',
   }
 
   # mundane required packages in the std repo
-  #package { 'jdk-1.6.0_26-fcs': }
   package { "$java_package": }
 }

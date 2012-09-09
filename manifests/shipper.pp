@@ -31,7 +31,7 @@ class logstash::shipper (
 
 
   # create the config file based on the transport we are using (this could also be extended to use different configs)
-  case  $logstash::common::logstash_transport {
+  case  $logstash::config::logstash_transport {
     /^redis$/: { $shipper_conf_content = template('logstash/shipper-input.conf.erb',
                                                   'logstash/shipper-filter.conf.erb',
                                                   'logstash/shipper-output-redis.conf.erb') }
@@ -50,8 +50,8 @@ class logstash::shipper (
     content => $shipper_conf_content
   }
 
-  # make sure the logstash::common class is declared before logstash::indexer
-  Class['logstash::common'] -> Class['logstash::shipper']
+  # make sure the logstash::config class is declared before logstash::indexer
+  Class['logstash::config'] -> Class['logstash::shipper']
 
   User  <| tag == 'logstash' |>
   Group <| tag == 'logstash' |>
@@ -60,10 +60,10 @@ class logstash::shipper (
   logstash::javainitscript { 'logstash-shipper':
     serviceuser    => 'root',
     servicegroup   => 'root',
-    servicehome    => $logstash::common::logstash_home,
-    servicelogfile => "$logstash::common::logstash_log/shipper.log",
+    servicehome    => $logstash::config::logstash_home,
+    servicelogfile => "$logstash::config::logstash_log/shipper.log",
     servicejar     => $logstash::package::jar,
-    serviceargs    => " agent -f /etc/logstash/shipper.conf -l $logstash::common::logstash_log/shipper.log",
+    serviceargs    => " agent -f /etc/logstash/shipper.conf -l $logstash::config::logstash_log/shipper.log",
   }
 
   service { 'logstash-shipper':

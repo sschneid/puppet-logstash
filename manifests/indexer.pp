@@ -4,17 +4,15 @@
 #
 # == Parameters:
 #
-# $param::   description of parameter. default value if any.
+# none - all config is pulled from the logstash::config class
 #
 # == Actions:
 #
-# Describe what this class does. What gets configured and how.
+# Installs the logstash jar & init script in the desired location
 #
 # == Requires:
 #
-# Requirements. This could be packages that should be made available.
-#
-# == Sample Usage:
+# logstash::config
 #
 # == Todo:
 #
@@ -23,21 +21,22 @@
 class logstash::indexer (
 ) {
 
-  # make sure the logstash::common class is declared before logstash::server
-  Class['logstash::common'] -> Class['logstash::indexer']
+  # make sure the logstash::config class is declared before logstash::indexer
+  Class['logstash::config'] -> Class['logstash::indexer']
+  Class['logstash::package'] -> Class['logstash::indexer']
 
-  
   User  <| tag == 'logstash' |>
   Group <| tag == 'logstash' |>
 
-  $jarname = $logstash::common::logstash_jar
-  $verbose = $logstash::common::logstash_verbose
+  $jarname = $logstash::config::logstash_jar
+  $verbose = $logstash::config::logstash_verbose
 
-  # create the config file based on the transport we are using (this could also be extended to use different configs)
-  case  $logstash::common::logstash_transport {
-    /^redis$/: { $indexer_conf_content = template('logstash/indexer-input-redis.conf.erb', 
-						  'logstash/indexer-filter.conf.erb', 
-						  'logstash/indexer-output.conf.erb') }
+  # create the config file based on the transport we are using
+  # (this could also be extended to use different configs)
+  case  $logstash::config::logstash_transport {
+    /^redis$/: { $indexer_conf_content = template('logstash/indexer-input-redis.conf.erb',
+                                                  'logstash/indexer-filter.conf.erb',
+                                                  'logstash/indexer-output.conf.erb') }
     /^amqp$/:  { $indexer_conf_content = template('logstash/indexer-input-amqp.conf.erb',
                                                   'logstash/indexer-filter.conf.erb',
                                                   'logstash/indexer-output.conf.erb') }
@@ -46,22 +45,22 @@ class logstash::indexer (
                                                   'logstash/indexer-output.conf.erb') }
   }
 
-  file { "$logstash::common::logstash_etc/indexer.conf":
+  file { "${logstash::config::logstash_etc}/indexer.conf":
     ensure  => 'file',
     group   => '0',
     mode    => '0644',
     owner   => '0',
-    content  => $indexer_conf_content,
+    content => $indexer_conf_content,
   }
 
-  # alternative startup script
+  # startup script
   logstash::javainitscript { 'logstash-indexer':
-    serviceuser    => $logstash::params::user,
-    servicegroup   => $logstash::params::group,
-    servicehome    => $logstash::common::logstash_home,
-    servicelogfile => "$logstash::common::logstash_log/indexer.log",
+    serviceuser    => $logstash::config::user,
+    servicegroup   => $logstash::config::group,
+    servicehome    => $logstash::config::logstash_home,
+    servicelogfile => "${logstash::config::logstash_log}/indexer.log",
     servicejar     => $logstash::package::jar,
-    serviceargs    => " agent -f $logstash::common::logstash_etc/indexer.conf -l $logstash::common::logstash_log/indexer.log", 
+    serviceargs    => " agent -f ${logstash::config::logstash_etc}/indexer.conf -l ${logstash::config::logstash_log}/indexer.log",
   }
 
   service { 'logstash-indexer':

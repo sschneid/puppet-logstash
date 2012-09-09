@@ -4,7 +4,9 @@
 class logstash::user (
   $logstash_homeroot = undef
 ) {
-  require logstash::params
+
+  # make sure the logstash::config class is declared before logstash::user
+  Class['logstash::config'] -> Class['logstash::user']
 
   User {
     ensure     => present,
@@ -15,17 +17,17 @@ class logstash::user (
 
   Group {
     ensure  => present,
-    require => User[$logstash::params::user]
+    require => User[$logstash::config::user]
   }
 
-  @user { $logstash::params::user:
+  @user { $logstash::config::user:
     comment => 'logstash system account',
     tag     => 'logstash',
     uid     => '3300',
     home    => "${logstash_homeroot}/logstash";
   }
 
-  @group { $logstash::params::group:
+  @group { $logstash::config::group:
     gid => '3300',
     tag => 'logstash';
   }

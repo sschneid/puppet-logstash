@@ -23,8 +23,8 @@
 class logstash::web (
 ) {
 
-  # make sure the logstash::common class is declared before logstash::indexer
-  Class['logstash::common'] -> Class['logstash::web']
+  # make sure the logstash::config class is declared before logstash::indexer
+  Class['logstash::config'] -> Class['logstash::web']
 
   User  <| tag == 'logstash' |>
   Group <| tag == 'logstash' |>
@@ -33,10 +33,10 @@ class logstash::web (
   logstash::javainitscript { 'logstash-web':
     serviceuser    => 'logstash',
     servicegroup   => 'logstash',
-    servicehome    => $logstash::common::logstash_home,
-    servicelogfile => "$logstash::common::logstash_log/web.log",
+    servicehome    => $logstash::config::logstash_home,
+    servicelogfile => "$logstash::config::logstash_log/web.log",
     servicejar     => $logstash::package::jar,
-    serviceargs    => " web -l $logstash::common::logstash_log/web.log",
+    serviceargs    => " web -l $logstash::config::logstash_log/web.log",
   }
 
   service { 'logstash-web':

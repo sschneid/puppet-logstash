@@ -19,19 +19,20 @@
 # == Todo:
 #
 # * Update documentation
+# * Add support for other ways providing redis?
 #
 class logstash::redis (
 ) {
 
-  # make sure the logstash::common class is declared before logstash::server
-  Class['logstash::common'] -> Class['logstash::redis']
+  # make sure the logstash::config class is declared before logstash::server
+  Class['logstash::config'] -> Class['logstash::redis']
 
-  if $logstash::common::redis_provider == 'package' {
-   
-    # build a package-version if we need to 
-    $redis_package = $logstash::common::redis_version ? {
-      /\d+./  => "$logstash::common::redis_package-$logstash::common::redis_version",
-      default => "$logstash::common::redis_package",
+  if $logstash::config::redis_provider == 'package' {
+
+    # build a package-version if we need to
+    $redis_package = $logstash::config::redis_version ? {
+      /\d+./  => "${logstash::config::redis_package}-${logstash::config::redis_version}",
+      default => $logstash::config::redis_package,
     }
 
     package { $redis_package:
@@ -40,11 +41,11 @@ class logstash::redis (
 
     # uor redis config file
     file { '/etc/redis.conf':
-      ensure => present,
+      ensure  => present,
       content => template('logstash/redis.conf.erb'),
-      require   => Package["$redis_package"],
+      require => Package[$redis_package],
     }
-  
+
     service { 'redis':
       ensure    => 'running',
       hasstatus => true,
