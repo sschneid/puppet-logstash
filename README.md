@@ -10,15 +10,16 @@ elasticsearch are available.
 
 Declare a config class that is used by the working classes:
 
+```puppet
   class { 'logstash::config':
     logstash_home => '/opt/logstash',
     logstash_jar_provider => 'http',
     logstash_transport => 'redis',
     redis_provider     => 'package',
   }
-
+```
 Then just apply the required classes to each node:
-
+```puppet
   # indexer/storage node
   class { 'logstash::indexer': }
   # use this class to provide transport that matches what we want, optional
@@ -29,7 +30,7 @@ Then just apply the required classes to each node:
 
   # web interface
   class { 'logstash::web': }
-
+```
 
 ##Configuration Detail##
 
