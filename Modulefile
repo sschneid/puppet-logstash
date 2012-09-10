@@ -1,5 +1,5 @@
 name    'simonmcc-logstash'
-version '0.0.2'
+version '0.0.4'
 author 'Simon McCartney'
 license 'UNKNOWN'
 summary 'install & configure logstash, including dependencies & init scripts'
