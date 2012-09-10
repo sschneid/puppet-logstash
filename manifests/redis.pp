@@ -39,19 +39,33 @@ class logstash::redis (
       ensure => present,
     }
 
-    # uor redis config file
-    file { '/etc/redis.conf':
+    # where is the redis config file?
+    $redis_conf = $operatingsystem ? {
+      ubuntu => '/etc/redis/redis.conf',
+      redhat => '/etc/redis.conf',
+      default => undef,
+    }
+
+    # our redis config file
+    file { "$redis_conf":
       ensure  => present,
       content => template('logstash/redis.conf.erb'),
       require => Package[$redis_package],
     }
 
-    service { 'redis':
+    # What's the service name on this platform?
+    $redis_service = $operatingsystem ? {
+      ubuntu => 'redis-server',
+      redhat => 'redis',
+      default => undef,
+    }
+    # make sure the service is defined & running
+    service { "$redis_service":
       ensure    => 'running',
       hasstatus => true,
       enable    => true,
-      subscribe => File['/etc/redis.conf'],
-      require   => File['/etc/redis.conf'],
+      subscribe => File[$redis_conf],
+      require   => File[$redis_conf],
     }
   }
 }

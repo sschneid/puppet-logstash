@@ -28,7 +28,9 @@ class logstash::shipper (
   $logfiles = '"/var/log/messages", "/var/log/syslog", "/var/log/*.log"'
 ) {
 
-
+  # make sure the logstash::config & logstash::package classes are declared before logstash::shipper
+  Class['logstash::config'] -> Class['logstash::shipper']
+  Class['logstash::package'] -> Class['logstash::shipper']
 
   # create the config file based on the transport we are using (this could also be extended to use different configs)
   case  $logstash::config::logstash_transport {

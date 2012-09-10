@@ -34,7 +34,9 @@ class logstash::config($logstash_home = '/usr/local/logstash',
   $redis_host = '127.0.0.1',
   $redis_port = '6379',
   $redis_key = 'logstash',
-  $java_home = '/usr/lib/jvm/jre-1.6.0-openjdk.x86_64'
+  $java_provider = 'package',
+  $java_package = 'openjdk',
+  $java_home = '/usr/lib/jvm/jre-1.6.0-openjdk.x86_64',
 ) {
 
   # just trying to make the fq variable a little less rediculous
@@ -64,10 +66,12 @@ class logstash::config($logstash_home = '/usr/local/logstash',
     recurse  => true,
   }
 
-  # make sure we have a logstash jar
+  # make sure we have a logstash jar (& dependencies, if we want)
   class { 'logstash::package':
     logstash_home     => $logstash_home,
-    logstash_provider => $logstash_jar_provider
+    logstash_provider => $logstash_jar_provider,
+    java_provider     => $java_provider,
+    java_package      => $java_package,
   }
 
   # create the service user & group if required

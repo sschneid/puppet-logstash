@@ -32,6 +32,7 @@ class logstash::package(
   $logstash_version = '1.1.1',
   $logstash_provider = 'http',
   $logstash_baseurl = 'http://semicomplete.com/files/logstash/',
+  $java_provider = 'external',
   $java_package = 'java-1.6.0-openjdk' )
 {
 
@@ -67,12 +68,15 @@ class logstash::package(
   if $logstash_provider == 'http' {
     $logstash_url = "$logstash_baseurl/$logstash_jar"
 
+    package { 'curl': }
+
     # pull in the logstash jar over http
     exec { "curl -o $logstash_home/$logstash_jar $logstash_url":
       timeout => 0,
       cwd     => "/tmp",
       creates => "$logstash_home/$logstash_jar",
       path    => ["/usr/bin", "/usr/sbin"],
+      require => Package['curl'],
     }
   }
 
@@ -80,6 +84,9 @@ class logstash::package(
     notify { "It's up to you to provde $logstash_jar": }
   }
 
-  # mundane required packages in the std repo
-  package { "$java_package": }
+  # can't do anything without a java runtime, so we might as well
+  # have a hook for pulling it in
+  if $java_provider == 'package' {
+    package { "$java_package": }
+  }
 }
