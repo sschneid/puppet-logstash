@@ -7,7 +7,8 @@ define logstash::javainitscript (
   $serviceuserhome = $servicehome,
   $servicelogfile,
   $servicejar,
-  $serviceargs
+  $serviceargs,
+  $java_home = '/usr/lib/jvm/jre-1.6.0-openjdk.x86_64'
 ) {
 
   file { "/etc/init.d/${servicename}":

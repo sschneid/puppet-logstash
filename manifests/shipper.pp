@@ -64,6 +64,7 @@ class logstash::shipper (
     servicelogfile => "$logstash::config::logstash_log/shipper.log",
     servicejar     => $logstash::package::jar,
     serviceargs    => " agent -f /etc/logstash/shipper.conf -l $logstash::config::logstash_log/shipper.log",
+    java_home      => $logstash::config::java_home,
   }
 
   service { 'logstash-shipper':

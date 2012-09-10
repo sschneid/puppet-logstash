@@ -61,6 +61,7 @@ class logstash::indexer (
     servicelogfile => "${logstash::config::logstash_log}/indexer.log",
     servicejar     => $logstash::package::jar,
     serviceargs    => " agent -f ${logstash::config::logstash_etc}/indexer.conf -l ${logstash::config::logstash_log}/indexer.log",
+    java_home      => $logstash::config::java_home,
   }
 
   service { 'logstash-indexer':
@@ -70,5 +71,21 @@ class logstash::indexer (
     require   => [ Logstash::Javainitscript['logstash-indexer'], Class['logstash::package'] ],
   }
 
+  # if we're running with elasticsearch embedded, make sure the data dir exists
+  if $logstash::config::elasticsearch_provider == 'embedded' {
+    file { "${logstash::config::logstash_home}/data/elasticsearch":
+      ensure => directory,
+      owner  => $logstash::config::logstash_user,
+      group  => $logstash::config::logstash_group,
+      before => Service['logstash-indexer'],
+      require => File["${logstash::config::logstash_home}/data"],
+    }
+
+    file { "${logstash::config::logstash_home}/data":
+      ensure => directory,
+      owner  => $logstash::config::logstash_user,
+      group  => $logstash::config::logstash_group,
+    }
+  }
 }
 

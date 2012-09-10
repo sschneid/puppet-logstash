@@ -6,6 +6,10 @@ output {
 
   # If you can't discover using multicast, set the address explicitly
   elasticsearch {
-    host => "127.0.0.1"
+<% if scope.lookupvar('logstash::config::elasticsearch_provider') == 'embedded' %>
+    embedded => true 
+<% else %>
+    host => "<%=scope.lookupvar('ilogstash::config::elasticsearch_host')%>"
+<% end %>
   }
 }
