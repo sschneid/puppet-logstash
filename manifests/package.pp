@@ -17,7 +17,7 @@
 #
 # == Requires:
 #
-# $logstash_provider='http' is the simplest and most tested method, 
+# $logstash_provider='http' is the simplest and most tested method,
 # it just curl's the file into place, so you need internet access,
 # unless you have mirror'd the file locally
 #

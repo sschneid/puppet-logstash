@@ -18,7 +18,7 @@
 #
 # * Update documentation
 #
-class logstash::config($logstash_home = '/usr/local/logstash',
+class logstash::config( $logstash_home = '/usr/local/logstash',
   $logstash_etc = '/etc/logstash',
   $logstash_log = '/var/log/logstash',
   $logstash_transport = 'amqp',
@@ -35,7 +35,7 @@ class logstash::config($logstash_home = '/usr/local/logstash',
   $redis_port = '6379',
   $redis_key = 'logstash',
   $java_provider = 'package',
-  $java_package = 'java-1.6.0-openjdk', 
+  $java_package = 'java-1.6.0-openjdk',
   $java_home = '/usr/lib/jvm/jre-1.6.0-openjdk.x86_64'
 ) {
 
@@ -75,8 +75,8 @@ class logstash::config($logstash_home = '/usr/local/logstash',
   }
 
   # create the service user & group if required
-  class { 'logstash::user': 
-    logstash_homeroot => $logstash::config::logstash_home 
+  class { 'logstash::user':
+    logstash_homeroot => $logstash::config::logstash_home
   }
 }
 
