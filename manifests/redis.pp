@@ -41,7 +41,7 @@ class logstash::redis (
 
     # where is the redis config file?
     $redis_conf = $operatingsystem ? {
-      ubuntu => '/etc/redis/redis.conf',
+      /(?i)(ubuntu|debian)/ => '/etc/redis/redis.conf',
       centos => '/etc/redis.conf',
       redhat => '/etc/redis.conf',
       default => undef,
@@ -56,7 +56,7 @@ class logstash::redis (
 
     # What's the service name on this platform?
     $redis_service = $operatingsystem ? {
-      ubuntu => 'redis-server',
+      /(?i)(ubuntu|debian)/ => 'redis-server',
       centos => 'redis',
       redhat => 'redis',
       default => undef,
