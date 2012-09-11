@@ -21,31 +21,30 @@
 # * Update documentation
 #
 class logstash::web (
-  $jarname ='logstash-1.1.0-monolithic.jar'
 ) {
 
-  file { '/etc/rc.d/init.d/logstash-web':
-    ensure => 'file',
-    group  => '0',
-    mode   => '0755',
-    owner  => '0',
-    source => 'puppet:///modules/logstash/logstash-web' ;
-  }
+  # make sure the logstash::common class is declared before logstash::indexer
+  Class['logstash::common'] -> Class['logstash::web']
 
-  file { '/usr/local/logstash/conf/web-wrapper.conf':
-    ensure   => 'file',
-    group    => '0',
-    mode     => '0644',
-    owner    => '0',
-    content  => template('logstash/web-wrapper.conf.erb');
+  User  <| tag == 'logstash' |>
+  Group <| tag == 'logstash' |>
+
+  # startup script
+  logstash::javainitscript { 'logstash-web':
+    serviceuser    => 'logstash',
+    servicegroup   => 'logstash',
+    servicehome    => $logstash::common::logstash_home,
+    servicelogfile => "$logstash::common::logstash_log/web.log",
+    servicejar     => $logstash::package::jar,
+    serviceargs    => " web -l $logstash::common::logstash_log/web.log",
   }
 
   service { 'logstash-web':
     ensure    => 'running',
     hasstatus => true,
     enable    => true,
+    require   => Logstash::Javainitscript['logstash-web'],
   }
-
 
 }
 

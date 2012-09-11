@@ -28,42 +28,49 @@ class logstash::shipper (
   $logfiles = '"/var/log/messages", "/var/log/syslog", "/var/log/*.log"'
 ) {
 
+
+
+  # create the config file based on the transport we are using (this could also be extended to use different configs)
+  case  $logstash::common::logstash_transport {
+    /^redis$/: { $shipper_conf_content = template('logstash/shipper-input.conf.erb',
+                                                  'logstash/shipper-filter.conf.erb',
+                                                  'logstash/shipper-output-redis.conf.erb') }
+    /^amqp$/:  { $shipper_conf_content = template('logstash/shipper-input.conf.erb',
+                                                  'logstash/shipper-filter.conf.erb',
+                                                  'logstash/shipper-output-amqp.conf.erb') }
+    default:   { $shipper_conf_content = undef }
+  }
+
+
   file {'/etc/logstash/shipper.conf':
     ensure  => 'file',
     group   => '0',
     mode    => '0644',
     owner   => '0',
-    content => template('logstash/shipper.conf.erb'),
+    content => $shipper_conf_content
   }
 
-  file { '/etc/rc.d/init.d/logstash-shipper':
-    ensure => 'file',
-    group  => '0',
-    mode   => '0755',
-    owner  => '0',
-    source => 'puppet:///modules/logstash/logstash-shipper' ;
-  }
+  # make sure the logstash::common class is declared before logstash::indexer
+  Class['logstash::common'] -> Class['logstash::shipper']
 
-  file { '/usr/local/logstash/conf/shipper-wrapper.conf':
-    ensure   => 'file',
-    group    => '0',
-    mode     => '0644',
-    owner    => '0',
-    content  => template('logstash/shipper-wrapper.conf.erb');
-  }
+  User  <| tag == 'logstash' |>
+  Group <| tag == 'logstash' |>
 
-  #  file { '/etc/logrotate.d/syslog':
-  #  ensure   => 'file',
-  #  group    => '0',
-  #  mode     => '0644',
-  #  owner    => '0',
-  #  source   => 'puppet:///modules/logstash/syslog.logrotate';
-  #}
+  # startup script
+  logstash::javainitscript { 'logstash-shipper':
+    serviceuser    => 'root',
+    servicegroup   => 'root',
+    servicehome    => $logstash::common::logstash_home,
+    servicelogfile => "$logstash::common::logstash_log/shipper.log",
+    servicejar     => $logstash::package::jar,
+    serviceargs    => " agent -f /etc/logstash/shipper.conf -l $logstash::common::logstash_log/shipper.log",
+  }
 
   service { 'logstash-shipper':
     ensure    => 'running',
     hasstatus => true,
     enable    => true,
+    require   => Logstash::Javainitscript['logstash-shipper'],
   }
 
 }

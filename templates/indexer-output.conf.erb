@@ -1,0 +1,11 @@
+output {
+  stdout { }
+
+  # If your elasticsearch server is discoverable with multicast, use this:
+  #elasticsearch { }
+
+  # If you can't discover using multicast, set the address explicitly
+  elasticsearch {
+    host => "127.0.0.1"
+  }
+}
