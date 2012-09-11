@@ -1,3 +1,9 @@
 logstash
 
-This is the logstash module.
+Simple puppet logstash modules, tries to take care of making sure redis &
+elasticsearch are available.
+
+Based on lots of original work by Kris Buytaert & Joe McDonagh 
+https://github.com/KrisBuytaert/puppet-logstash
+https://github.com/thesilentpenguin/puppet-logstash
+
