@@ -25,7 +25,8 @@ class logstash::shipper (
   $verbose = 'no',
   $jarname = "logstash-$logstash::config::logstash_version-monolithic.jar",
   # TODO This needs refactoring :)
-  $logfiles = '"/var/log/messages", "/var/log/syslog", "/var/log/*.log"'
+  $logfiles = '"/var/log/messages", "/var/log/syslog", "/var/log/*.log"',
+  $configfiles = []
 ) {
 
   # make sure the logstash::config & logstash::package classes are declared before logstash::shipper
@@ -33,16 +34,19 @@ class logstash::shipper (
   Class['logstash::package'] -> Class['logstash::shipper']
 
   # create the config file based on the transport we are using (this could also be extended to use different configs)
-  case  $logstash::config::logstash_transport {
-    /^redis$/: { $shipper_conf_content = template('logstash/shipper-input.conf.erb',
-                                                  'logstash/shipper-filter.conf.erb',
-                                                  'logstash/shipper-output-redis.conf.erb') }
-    /^amqp$/:  { $shipper_conf_content = template('logstash/shipper-input.conf.erb',
-                                                  'logstash/shipper-filter.conf.erb',
-                                                  'logstash/shipper-output-amqp.conf.erb') }
-    default:   { $shipper_conf_content = undef }
+  if (empty($configfiles)) {
+    case  $logstash::config::logstash_transport {
+      /^redis$/: { $shipper_conf_content = template('logstash/shipper-input.conf.erb',
+                                                    'logstash/shipper-filter.conf.erb',
+                                                    'logstash/shipper-output-redis.conf.erb') }
+      /^amqp$/:  { $shipper_conf_content = template('logstash/shipper-input.conf.erb',
+                                                    'logstash/shipper-filter.conf.erb',
+                                                    'logstash/shipper-output-amqp.conf.erb') }
+      default:   { $shipper_conf_content = undef }
+    }
+  } else {
+    $shipper_conf_content = template('logstash/shipper-customize.conf.erb')
   }
-
 
   file {'/etc/logstash/shipper.conf':
     ensure  => 'file',
