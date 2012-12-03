@@ -45,6 +45,7 @@ class logstash::shipper::defaultconfig (
     group   => '0',
     mode    => '0644',
     owner   => '0',
-    content => $shipper_conf_content
+    content => $shipper_conf_content,
+    notify  => Service['logstash-shipper']
   }
 }
