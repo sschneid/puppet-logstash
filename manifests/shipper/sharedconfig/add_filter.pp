@@ -1,4 +1,4 @@
-define logstash::sharedconfig::add_filter($template='') {
+define logstash::shipper::sharedconfig::add_filter($template='') {
 
   if (!defined(Package['grok'])) {
     package { 'grok':
@@ -6,7 +6,7 @@ define logstash::sharedconfig::add_filter($template='') {
     }
   }
 
-  logstash::sharedconfig::add_config { $name:
+  logstash::shipper::sharedconfig::add_config { $name:
     template => $template,
     order    => 200
   }

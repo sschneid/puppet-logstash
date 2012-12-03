@@ -1,4 +1,4 @@
-define logstash::sharedconfig::add_config($template='', $order=1) {
+define logstash::shipper::sharedconfig::add_config($template='', $order=1) {
 
   if (empty($template)) {
     $content = template($name)
@@ -17,6 +17,7 @@ define logstash::sharedconfig::add_config($template='', $order=1) {
   concat::fragment { "logstash_addconfig_${name}":
     target  => '/etc/logstash/shipper.conf',
     order   => $order,
-    content => $content 
+    content => $content
   }
+
 }
