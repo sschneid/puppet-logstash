@@ -1,24 +1,23 @@
-# = Class: logstash::shipper
+# = Class: logstash::shipper::defaultconfig
 #
-# Description of logstash::shipper
+# Startegy class which generates a Logstash shipper configuration depending on the
+# configured transport.
 #
 # == Parameters:
 #
-# $param::   description of parameter. default value if any.
+# $logstash_server:: Address of the logstash server (indexer)
+# $configfile::      Absolute path to the logstash shipper configuration file
+# $params::          Parameter hash which is passed to this strategy class. This class supports the key "logfiles".
 #
 # == Actions:
 #
-# Describe what this class does. What gets configured and how.
+# Generates a shipper configuration, depending on transport defined in logstash::config.
 #
 # == Requires:
-#
-# Requirements. This could be packages that should be made available.
 #
 # == Sample Usage:
 #
 # == Todo:
-#
-# * Update documentation
 #
 class logstash::shipper::defaultconfig (
   $logstash_server,

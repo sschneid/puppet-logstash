@@ -1,22 +1,26 @@
 # = Class: logstash::shipper::sharedconfig
 #
-# Description of logstash::shipper:sharedconfig
+# Strategy class which generates a Logstash shipper configuration. Other Puppet modules
+# can add their filter, input or output configurations to the shipper configuration.
 #
 # == Parameters:
 #
-# $logstash_server: The address of the logstash server.
+# $logstash_server:: The address of the logstash server.
+# $configfile::      The absolute path to the logstash shipper configuration.
+# $params::          Parameter hash passed to this strategy class (not needed by this strategy yet).
 #
 # == Actions:
 #
-# Generates the Logstash shipper configuration. The benefit of a shared configuration is, that other modules are able to 
+# Generates the Logstash shipper configuration using the Puppet-Concat module.
+# The benefit of a shared configuration is, that other modules are able to 
 # add Logstash configuration units. Three defines are provided to add filter, input or output configurations:
 #
-# * logstash::shipper::add_filter
-# * logstash::shipper::add_input
-# * logstash::shipper::add_output
+# * logstash::shipper::sharedconfig::add_filter
+# * logstash::shipper::sharedconfig::add_input
+# * logstash::shipper::sharedconfig::add_output
 #
-# The disadvantage of this appraoch is that such modules are no longer loosely coupled and require this Logstash module.
-#
+# Disadvantage: other modules using such a define are coupled to this logstash module.
+# 
 # == Requires:
 #
 # puppet-concat (see https://github.com/ripienaar/puppet-concat)
@@ -43,10 +47,10 @@ class logstash::shipper::sharedconfig (
 
   case  $logstash::config::logstash_transport {
     /^redis$/: {
-      $output_conf = "redis { host => \"${logstash::config::redis_host}\" data_type => \"list\" key => \"logstash\" }"
+      $output_conf = template('logstash/sharedconfig/shipper-output-redis.conf.erb')
     }
     /^amqp$/:  {
-      $output_conf = "amqp { host => \"${logstash_server}\" exchange_type => \"fanout\" name => \"rawlogs\" }"
+      $output_conf = template('logstash/sharedconfig/shipper-output-amqp.conf.erb') 
     }
     default: {
       $output_conf = '' 
@@ -54,7 +58,7 @@ class logstash::shipper::sharedconfig (
   }
 
   concat::fragment {
-    'inputs':
+    'input':
       target  => $configfile,
       content => "input {\n",
       order   => 0;
