@@ -2,7 +2,7 @@ input {
   file {
     type => "syslog"
     # Wildcards work here :)
-    path => [ <%= params[l'logfiles'] %> ]
+    path => [ <%= params['logfiles'] %> ]
   }
 }
 
