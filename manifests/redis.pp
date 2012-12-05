@@ -42,7 +42,7 @@ class logstash::redis (
 
     # operatingsystem specific file & service names
     case $operatingsystem {
-      centos, redhat: { $redis_conf = '/etc/redis.conf'
+      centos, redhat, OEL: { $redis_conf = '/etc/redis.conf'
                         $redis_service = 'redis' }
       ubuntu, debian: { $redis_conf = '/etc/redis/redis.conf'
                         $redis_service = 'redis-server' }
