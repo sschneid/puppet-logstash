@@ -1,0 +1,6 @@
+# nicked from https://gist.github.com/1346387
+
+APACHEERRORTIME %{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}
+APACHEERRORPREFIX \[%{APACHEERRORTIME:timestamp}\] \[%{NOTSPACE:apacheseverity}\] \[client %{IPORHOST:sourcehost}\]
+GENERICAPACHEERROR %{APACHEERRORPREFIX} %{GREEDYDATA:message}
+
