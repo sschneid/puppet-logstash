@@ -17,6 +17,7 @@ Declare a config class that is used by the working classes:
     logstash_jar_provider => 'http',
     logstash_transport => 'redis',
     redis_provider     => 'package',
+    elasticsearch_provider => 'embedded',
   }
   # there is a redis RPM here:
   yumrepo { 'yum.mccartney.ie':
