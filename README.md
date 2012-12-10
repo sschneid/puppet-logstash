@@ -40,30 +40,27 @@ Then just apply the required classes to each node:
   class { 'logstash::web': }
 ```
 
-### Customize shipper configuration
-Different configuration strategies are available for building the shipper configuration file. 
+### Shipper configuration
+Different configuration strategies are available to generate the shipper configuration file. 
 #### Default
-This strategy tracks syslog events. The monitored log files can be defined in the $config_params
-parameter hash by setting a "logfiles" key together with a CSV-string with the logfiles as value.
+This strategy tracks events in the syslog format. The monitored log files can be defined in the $config_params
+parameter hash by setting a "logfiles" key together with a CSV-string containing the logfiles as value.
 
 The default strategy is used if no configuration parameters were passed to the shipper class.
 ```puppet
   # Default configuration strategy
   class { 'logstash::shipper':
-    $config_strategy = 'logstash::shipper::defaultconfig',
-    $config_params = {
+    config_strategy => 'logstash::shipper::defaultconfig',
+    config_params   => {
       logfiles  => '"/var/log/messages", "/var/log/syslog", "/var/log/*.log"'
     }    
   }
 ```
 
 #### Shared
-The shared configuration strategy enables other Puppet modules to define the logstash configuration.
-All configuration snippets are later concatenated to one shipper configuration file.
+The shared configuration strategy enables other Puppet modules to add configuration snippets to the shipper configuration. All snippets are later concatenated to one shipper configuration file.
 
-The shared configuration strategy is using Puppet-Concat (see https://github.com/ripienaar/puppet-concat).
-If you want to use the shared configuration, please make sure that the Puppet-Concat
-module is available in the modulepath.
+The shared configuration strategy is using Puppet-Concat (see https://github.com/ripienaar/puppet-concat). Please make sure that the Puppet-Concat module is available in the modulepath.
 ```puppet
   class { 'logstash::shipper':
     config_strategy => 'logstash::shipper::sharedconfig',
@@ -72,8 +69,8 @@ module is available in the modulepath.
 ```
 
 Other modules can use defines to add input, output or filter snippets to the shipper configuration.
-The name of the define can be the template file which contains the logstash configuration.
-Alternativelly, the template file can be set in the template parameter.
+The define name should be the template file which contains the configuration snippet.
+Alternativelly, the template file can be set with the template parameter.
 ```puppet
   # add a filter configuration
   logstash::shipper::sharedconfig::add_filter { 'mymodule/logstash/shipper-filter.conf.erb': }
