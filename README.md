@@ -69,8 +69,8 @@ The shared configuration strategy is using Puppet-Concat (see https://github.com
 ```
 
 Other modules can use defines to add input, output or filter snippets to the shipper configuration.
-The define name should be the template file which contains the configuration snippet.
-Alternativelly, the template file can be set with the template parameter.
+The define name should contain the path to the template file which contains the configuration snippet.
+Alternativelly, the template path can be set with the template parameter.
 ```puppet
   # add a filter configuration
   logstash::shipper::sharedconfig::add_filter { 'mymodule/logstash/shipper-filter.conf.erb': }
@@ -80,7 +80,7 @@ Alternativelly, the template file can be set with the template parameter.
 
   # add an output configuration
   logstash::shipper::sharedconfig::add_output { 'a_custom_name':
-    template => mymodule/logstash/shipper-output.conf.erb'
+    template => 'mymodule/logstash/shipper-output.conf.erb'
   }
 ```
 
