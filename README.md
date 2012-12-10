@@ -47,7 +47,7 @@ This strategy tracks syslog events. The monitored log files can be defined in th
 parameter hash by setting a "logfiles" key together with a CSV-string with the logfiles as value.
 
 The default strategy is used if no configuration parameters were passed to the shipper class.
-...puppet
+```puppet
   # Default configuration strategy
   class { 'logstash::shipper':
     $config_strategy = 'logstash::shipper::defaultconfig',
@@ -55,7 +55,7 @@ The default strategy is used if no configuration parameters were passed to the s
       logfiles  => '"/var/log/messages", "/var/log/syslog", "/var/log/*.log"'
     }    
   }
-...
+```
 
 #### Shared
 The shared configuration strategy enables other Puppet modules to define the logstash configuration.
@@ -64,17 +64,17 @@ All configuration snippets are later concatenated to one shipper configuration f
 The shared configuration strategy is using Puppet-Concat (see https://github.com/ripienaar/puppet-concat).
 If you want to use the shared configuration, please make sure that the Puppet-Concat
 module is available in the modulepath.
-...puppet
+```puppet
   class { 'logstash::shipper':
     config_strategy => 'logstash::shipper::sharedconfig',
     config_params   => {}
   }
-...
+```
 
 Other modules can use defines to add input, output or filter snippets to the shipper configuration.
 The name of the define can be the template file which contains the logstash configuration.
 Alternativelly, the template file can be set in the template parameter.
-...puppet
+```puppet
   # add a filter configuration
   logstash::shipper::sharedconfig::add_filter { 'mymodule/logstash/shipper-filter.conf.erb': }
 
@@ -85,7 +85,7 @@ Alternativelly, the template file can be set in the template parameter.
   logstash::shipper::sharedconfig::add_output { 'a_custom_name':
     template => mymodule/logstash/shipper-output.conf.erb'
   }
-...
+```
 
 ###Sample config for Ubuntu Precise (12.04)
 ```puppet
