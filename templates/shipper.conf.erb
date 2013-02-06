@@ -1,7 +1,6 @@
 input {
   file {
     type => "syslog"
-    # Wildcards work here :)
     path => [ <%= params['logfiles'] %> ]
     sincedb => "/etc/logstash/.sincedb"
   }

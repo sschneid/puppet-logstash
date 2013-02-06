@@ -1,8 +1,8 @@
 input {
   file {
     type => "syslog"
-    # Wildcards work here :)
     path => [ <%= params['logfiles'] %> ]
+    sincedb => "/etc/logstash/.sincedb"
   }
 
   # polaris apache error logs (with rolling datestamp filename via cronolog)
